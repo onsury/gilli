@@ -258,6 +258,17 @@ function Ticker() {
 
 function Header({ pincode, setPincode, setDrawer }) {
   const pc = CHENNAI_PINCODES.find(p => p.code === pincode);
+  const [dateStr, setDateStr] = useState("");
+
+  useEffect(() => {
+    setDateStr(new Date().toLocaleDateString("en-IN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }));
+  }, []);
+
   return (
     <header style={{ background: C.bg, borderBottom: `1px solid ${C.border}`, position: "sticky", top: 0, zIndex: 100 }}>
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "10px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -267,7 +278,7 @@ function Header({ pincode, setPincode, setDrawer }) {
         </div>
         <div style={{ textAlign: "center" }}>
           <div style={{ fontFamily: f.sans, fontSize: 11, color: C.light, letterSpacing: "0.05em" }}>
-            {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            {dateStr}
           </div>
           <div style={{ fontFamily: f.serif, fontSize: 12, fontStyle: "italic", color: C.muted }}>Your Neighbourhood. Your News.</div>
         </div>

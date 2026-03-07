@@ -14,6 +14,7 @@ import {
 import { sendTextMessage, sendButtonMessage, markAsRead, downloadMedia } from "../whatsapp.js";
 import { generateBill, generateOrderSummary } from "../billing/bill-generator.js";
 import { parseUploadedFile, buildCatalogText } from "../parsers/excel-parser.js";
+import { getNewsForPincode, getCoveredPincodes } from "../news.js";
 
 // ========================================================================
 // MAIN ROUTER
@@ -32,7 +33,58 @@ export async function routeMessage(senderPhone, message) {
     await updateSession(senderPhone, { state: "AWAITING_ROLE", role: null, onboarding: {} });
     return;
   }
+// ---- NEWS commands ----
+  // Detect: "news", "news 600004", "600004", "gully news"
+  const isNewsCmd = tl === "news" ||
+    tl === "gully news" ||
+    tl === "today's news" ||
+    tl === "todays news" ||
+    tl.startsWith("news ") ||
+    /^6000\d{2}$/.test(tl.trim());  // bare 6-digit Chennai pincode
 
+  if (isNewsCmd) {
+    if (message.id) await markAsRead(message.id);
+
+    // Extract pincode from message if present
+    const pincodeMatch = text.match(/6000\d{2}/);
+    const pincode = pincodeMatch ? pincodeMatch[0] : null;
+
+    // If no pincode — check if we have one stored from session
+    const storedPincode = session?.lastPincode || null;
+    const targetPincode = pincode || storedPincode;
+
+    if (!targetPincode) {
+      // Ask for pincode
+      const covered = await getCoveredPincodes();
+      let msg = "📰 *Gully News*\n\nSend your Chennai pincode to get your neighbourhood news.\n\n";
+      if (covered.length > 0) {
+        msg += `*Areas covered today:*\n`;
+        msg += covered.slice(0, 10).join(" · ");
+        if (covered.length > 10) msg += ` ...+${covered.length - 10} more`;
+        msg += "\n\nExample: Reply *600004* for Mylapore news";
+      }
+      await sendTextMessage(senderPhone, msg);
+      return;
+    }
+
+    // Save pincode to session for future
+    if (pincode && session) {
+      await updateSession(senderPhone, { lastPincode: pincode });
+    }
+
+    // Fetch and send news
+    await sendTextMessage(senderPhone, `📰 Fetching Gully News for ${targetPincode}...`);
+    const newsMsg = await getNewsForPincode(targetPincode);
+
+    if (newsMsg) {
+      await sendTextMessage(senderPhone, newsMsg);
+    } else {
+      await sendTextMessage(senderPhone,
+        `📰 No news found for ${targetPincode} right now.\n\nTry *chennai news* for general Chennai updates, or check back in a few hours.\n\nNews refreshes every 24 hours.`
+      );
+    }
+    return;
+  }
   if (message.id) await markAsRead(message.id);
 
   // ---- Global commands ----
