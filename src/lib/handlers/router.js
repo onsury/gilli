@@ -33,6 +33,14 @@ export async function routeMessage(senderPhone, message) {
     await updateSession(senderPhone, { state: "AWAITING_ROLE", role: null, onboarding: {} });
     return;
   }
+    // ---- Global commands ----
+    const tl = text.toLowerCase();
+    if (tl === "reset" || tl === "start over" || tl === "restart") {
+      await deleteSession(senderPhone);
+      await sendWelcome(senderPhone);
+      await updateSession(senderPhone, { state: "AWAITING_ROLE", role: null, onboarding: {} });
+      return;
+    }
 // ---- NEWS commands ----
   // Detect: "news", "news 600004", "600004", "gully news"
   const isNewsCmd = tl === "news" ||
@@ -86,15 +94,6 @@ export async function routeMessage(senderPhone, message) {
     return;
   }
   if (message.id) await markAsRead(message.id);
-
-  // ---- Global commands ----
-  const tl = text.toLowerCase();
-  if (tl === "reset" || tl === "start over" || tl === "restart") {
-    await deleteSession(senderPhone);
-    await sendWelcome(senderPhone);
-    await updateSession(senderPhone, { state: "AWAITING_ROLE", role: null, onboarding: {} });
-    return;
-  }
 
   // ---- Route by state ----
   try {
