@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@dataconnect/admin-generated": "file:src/dataconnect-admin-generated",
     "firebase": "^12.10.0",
     "firebase-admin": "^13.6.1",
