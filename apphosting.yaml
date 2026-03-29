@@ -23,7 +23,7 @@ env:
       - RUNTIME
 
   - variable: META_PHONE_NUMBER_ID
-    value: 101435117176164
+    value: 1014351171761641
     availability:
       - RUNTIME
 
@@ -33,7 +33,7 @@ env:
       - RUNTIME
   - variable: META_ACCESS_TOKEN
 
-    value: EAASYrKSZC3TsBRKjJ0IiZBNVCKPZCJTo4xy3zQLv17FdsShxgKS02h3GfJmkbAdVLGdyqBsVU1ETHL6r6vISRUX73xWSdiVbCOZAceOCK6uZAzKZCmOBOmjWIxkZAtUh7DO9JR7xxz56s0QjV7mG8vghssD6FA00nV27plVtvwN7ff1NT8qUqptsSwPNXkk2lkOJMjl3zsKc2vAbcNadBeeZCzmTfnJjcsO2SHfikZAllNIideZAwn2AVrPZB4EQR29balMf5kQOOIveP4CYnDpqRFS
+    value: YOUR_NEW_TOKEN_HERE
 
     availability:
 
