@@ -41,6 +41,24 @@ export async function routeMessage(senderPhone, message) {
       await updateSession(senderPhone, { state: "AWAITING_ROLE", role: null, onboarding: {} });
       return;
     }
+    // ---- BUSINESS DIRECTORY: Find businesses from Golden Chennai data ----
+const isBusinessSearch =
+tl.startsWith("find ") ||
+tl.startsWith("search ") ||
+tl.startsWith("where is ") ||
+tl.includes("near me") ||
+tl.includes("in 600") ||
+tl.startsWith("doctor") ||
+tl.startsWith("hospital") ||
+tl.startsWith("restaurant") ||
+tl.startsWith("pharmacy") ||
+tl.startsWith("clinic");
+
+if (isBusinessSearch) {
+if (message.id) await markAsRead(message.id);
+await handleBusinessSearch(senderPhone, text, session);
+return;
+}
 // ---- NEWS commands ----
   // Detect: "news", "news 600004", "600004", "gully news"
   const isNewsCmd = tl === "news" ||
@@ -908,4 +926,110 @@ function parseTextProducts(text) {
     }
   }
   return products;
+}
+// ========================================================================
+// BUSINESS DIRECTORY — Search Golden Chennai data in Firestore
+// ========================================================================
+async function handleBusinessSearch(phone, text, session) {
+  const tl = text.toLowerCase();
+  
+  // Extract pincode if present
+  const pincodeMatch = text.match(/6\d{5}/);
+  const pincode = pincodeMatch ? pincodeMatch[0] : session?.lastPincode || null;
+
+  // Extract search term — remove command words
+  const searchTerm = tl
+    .replace(/find|search|where is|near me|in 6\d{5}/gi, "")
+    .trim();
+
+  try {
+    let snapshot;
+    const bizRef = db.collection("businesses");
+
+    if (pincode && searchTerm) {
+      // Search by pincode + category keyword
+      snapshot = await bizRef
+        .where("pincode", "==", pincode)
+        .limit(50)
+        .get();
+      
+      // Filter by search term client-side
+      const allDocs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      const matches = allDocs.filter(b => {
+        const searchable = `${b.name} ${b.category} ${b.category_name} ${b.address} ${b.area}`.toLowerCase();
+        return searchTerm.split(" ").some(word => word.length > 2 && searchable.includes(word));
+      });
+
+      if (matches.length === 0) {
+        await sendTextMessage(phone,
+          `No businesses found for "${searchTerm}" in ${pincode}.\n\nTry:\n• A different keyword\n• Your pincode only (e.g. *600028*)\n• Category name (doctor, restaurant, pharmacy)`
+        );
+        return;
+      }
+
+      // Format results
+      let msg = `📍 *${searchTerm.toUpperCase()} in ${pincode}*\n`;
+      msg += `Found ${matches.length} businesses\n\n`;
+
+      matches.slice(0, 10).forEach((b, i) => {
+        msg += `*${i + 1}. ${b.name}*\n`;
+        if (b.address) msg += `   📍 ${b.address}\n`;
+        if (b.area) msg += `   ${b.area}\n`;
+        if (b.tel && b.tel !== "-" && b.tel !== "") msg += `   📞 ${b.tel}\n`;
+        if (b.mobile && b.mobile !== "-" && b.mobile !== "") {
+          const clean = b.mobile.replace(/\D/g, "").slice(-10);
+          msg += `   💬 wa.me/91${clean}\n`;
+        }
+        msg += "\n";
+      });
+
+      if (matches.length > 10) msg += `...+${matches.length - 10} more results\n\nRefine your search to see more specific results.`;
+
+      await sendTextMessage(phone, msg);
+      if (pincode) await updateSession(phone, { lastPincode: pincode });
+
+    } else if (pincode) {
+      // Show categories available in this pincode
+      snapshot = await bizRef
+        .where("pincode", "==", pincode)
+        .limit(100)
+        .get();
+
+      if (snapshot.empty) {
+        await sendTextMessage(phone, `No businesses found for pincode ${pincode} yet.\n\nTry: *find doctor in 600028*`);
+        return;
+      }
+
+      const docs = snapshot.docs.map(d => d.data());
+      const categories = {};
+      docs.forEach(b => {
+        const cat = b.category_name || b.category || "Other";
+        categories[cat] = (categories[cat] || 0) + 1;
+      });
+
+      const topCats = Object.entries(categories)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+      let msg = `📍 *Businesses in ${pincode}*\n`;
+      msg += `${docs.length} listings found\n\n`;
+      msg += `*Categories:*\n`;
+      topCats.forEach(([cat, count]) => {
+        msg += `• ${cat} (${count})\n`;
+      });
+      msg += `\nSearch: *find [category] in ${pincode}*\nExample: *find restaurant in ${pincode}*`;
+
+      await sendTextMessage(phone, msg);
+      await updateSession(phone, { lastPincode: pincode });
+
+    } else {
+      // No pincode — ask for it
+      await sendTextMessage(phone,
+        `🔍 *Business Directory*\n\nSearch Chennai businesses by pincode.\n\n*Examples:*\n• find doctor in 600028\n• restaurant in 600004\n• pharmacy 600040\n\n*Pilot pincodes:*\n• 600028 — RA Puram / Santhome\n• 600040 — Anna Nagar\n• 600017 — T Nagar\n• 600001 — Parrys\n• 600004 — Mylapore\n\nSend your pincode to get started.`
+      );
+    }
+  } catch (err) {
+    console.error("Business search error:", err);
+    await sendTextMessage(phone, "Search temporarily unavailable. Please try again.");
+  }
 }

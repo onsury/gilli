@@ -1,23 +1,40 @@
-# Settings for Backend (on Cloud Run).
-# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
 runConfig:
   minInstances: 0
-  # maxInstances: 100
-  # concurrency: 80
-  # cpu: 1
-  # memoryMiB: 512
 
-# Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
+env:
+  - variable: FIREBASE_PROJECT_ID
+    value: gilli-app
+    availability:
+      - RUNTIME
 
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  - variable: FIREBASE_CLIENT_EMAIL
+    value: firebase-adminsdk-fbsvc@gilli-app.iam.gserviceaccount.com
+    availability:
+      - RUNTIME
+
+  - variable: FIREBASE_PRIVATE_KEY
+    secret: FIREBASE_PRIVATE_KEY
+    availability:
+      - RUNTIME
+
+  - variable: META_VERIFY_TOKEN
+    value: gilli-verify-2026
+    availability:
+      - RUNTIME
+
+  - variable: META_PHONE_NUMBER_ID
+    value: 101435117176164
+    availability:
+      - RUNTIME
+
+  - variable: GEMINI_API_KEY
+    value: AIzaSyCDiRfqhuQ_oEzSuIQJRasgLren__x5png
+    availability:
+      - RUNTIME
+  -- variable: META_ACCESS_TOKEN
+
+    value: EAASYrKSZC3TsBQ43tB78gpXBw7RZB1guQfeXgXZCY84AAX27wAHOCdXaHSAUed7U1JdPSK5SlYSQyLIeGfW9aEYORhMl8XHiluFxZBwr19O0AI1gQobB3mT5a2TZBgPcqudgmVY3KjgAfuKX6NM74MGWdJnwmPeKFTVNQZB6qjIi22E4zRXZBhXS3fZCZASgVn8ZBlYZCzKe7ZAZCjEVHRj3VeYXi4J91ZAeOR4EepjHavOq7sEnTWOBVdFU9G4bKHoTCchrWJA9TREVUfCC24iZBjecnPYyJSDawZDZD
+
+    availability:
+
+      - RUNTIME
