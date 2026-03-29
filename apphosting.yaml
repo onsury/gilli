@@ -23,7 +23,7 @@ env:
       - RUNTIME
 
   - variable: META_PHONE_NUMBER_ID
-    value: 15551498649
+    value: 1014351171761641
     availability:
       - RUNTIME
 
