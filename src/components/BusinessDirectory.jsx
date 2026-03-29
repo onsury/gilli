@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase-client';
+import { clientDb as db } from '../lib/firebase-client';
 
 const CATEGORIES = [
   'All', 'Restaurants', 'Clinics', 'Fast Foods',
