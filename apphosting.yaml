@@ -46,8 +46,6 @@ env:
     value: gully-news-2026
     availability:
       - RUNTIME
-  - variable: ANTHROPIC_API_KEY
-    secret: ANTHROPIC_API_KEY
     availability:
       - RUNTIME
   - variable: CRON_SECRET
