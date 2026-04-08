@@ -59,6 +59,19 @@ if (message.id) await markAsRead(message.id);
 await handleBusinessSearch(senderPhone, text, session);
 return;
 }
+  // ---- GULLY AWARDS: Vote and nominate ----
+const isVoteCmd = tl === "vote" ||
+  tl.startsWith("vote ") ||
+  tl === "awards" ||
+  tl === "gully awards" ||
+  tl === "best gully" ||
+  tl.startsWith("nominate ");
+
+if (isVoteCmd) {
+  if (message.id) await markAsRead(message.id);
+  await handleGullyAwards(senderPhone, text, session);
+  return;
+}
 // ---- NEWS commands ----
   // Detect: "news", "news 600004", "600004", "gully news"
   const isNewsCmd = tl === "news" ||
@@ -1032,4 +1045,223 @@ async function handleBusinessSearch(phone, text, session) {
     console.error("Business search error:", err);
     await sendTextMessage(phone, "Search temporarily unavailable. Please try again.");
   }
+}
+// ========================================================================
+// GULLY AWARDS — Pincode polling and nominations
+// ========================================================================
+async function handleGullyAwards(phone, text, session) {
+  const tl = text.toLowerCase().trim();
+
+  const CATEGORIES = [
+    { id: "salon", emoji: "💇", label: "Best Salon Experience" },
+    { id: "restaurant", emoji: "🍱", label: "Best Restaurant / Tiffin" },
+    { id: "kirana", emoji: "🛒", label: "Most Trusted Kirana / Grocery" },
+    { id: "park", emoji: "🌳", label: "Best Maintained Park" },
+    { id: "street", emoji: "🛣️", label: "Cleanest Street" },
+    { id: "apartment", emoji: "🏢", label: "Best Maintained Apartment" },
+    { id: "school", emoji: "🎓", label: "Best School Community" },
+    { id: "autorickshaw", emoji: "🛺", label: "Most Honest Auto Driver" },
+  ];
+
+  const PINCODES = {
+    "600028": "RA Puram / Santhome / Mandaveli",
+    "600040": "Anna Nagar",
+    "600017": "T Nagar",
+    "600001": "Parrys / George Town",
+    "600004": "Mylapore",
+  };
+
+  // Extract pincode from message
+  const pincodeMatch = text.match(/6\d{5}/);
+  const pincode = pincodeMatch ? pincodeMatch[0] : session?.lastPincode || null;
+  const areaName = PINCODES[pincode] || null;
+
+  // ---- NOMINATE flow ----
+  if (tl.startsWith("nominate ")) {
+    const nomination = text.replace(/^nominate\s*/i, "").trim();
+    if (!pincode) {
+      await sendTextMessage(phone,
+        "📍 Which pincode are you nominating for?\nExample: *nominate 600028 Naturals Salon Chamiers Road*"
+      );
+      return;
+    }
+    if (nomination.length < 3) {
+      await sendTextMessage(phone, "Please add the business name after *nominate*\nExample: *nominate Naturals Salon Chamiers Road*");
+      return;
+    }
+
+    // Save nomination to Firestore
+    if (db) {
+      await db.collection("awards_nominations").add({
+        phone,
+        pincode,
+        area: areaName,
+        nomination,
+        createdAt: new Date(),
+        votes: 0,
+      });
+    }
+
+    await sendTextMessage(phone,
+      `🏆 *Nomination received!*\n\n` +
+      `"${nomination}" has been nominated for *Best Gully Awards ${pincode}*\n\n` +
+      `Share this with neighbours to get more votes:\n` +
+      `_Send *vote ${pincode}* to this number to vote_\n\n` +
+      `Results announced quarterly. Good luck! 🎉`
+    );
+    return;
+  }
+
+  // ---- No pincode — ask for it ----
+  if (!pincode || !PINCODES[pincode]) {
+    await sendTextMessage(phone,
+      `🏆 *Gully Awards 2026*\n` +
+      `_India's first pincode-based neighbourhood awards_\n\n` +
+      `Send your pincode to vote:\n\n` +
+      `• *vote 600028* — RA Puram / Santhome\n` +
+      `• *vote 600040* — Anna Nagar\n` +
+      `• *vote 600017* — T Nagar\n` +
+      `• *vote 600001* — Parrys / George Town\n` +
+      `• *vote 600004* — Mylapore\n\n` +
+      `🏅 Categories: Salon · Restaurant · Kirana · Park · Street · Apartment · School\n\n` +
+      `Winners get the *Best Gully 2026* award — chosen entirely by residents like you.`
+    );
+    return;
+  }
+
+  // ---- Show voting session state ----
+  const awardsState = session?.awardsState;
+
+  // ---- Step 1: Show categories ----
+  if (!awardsState || awardsState === "start") {
+    let msg = `🏆 *Best Gully Awards — ${areaName}*\n`;
+    msg += `_Pincode ${pincode}_\n\n`;
+    msg += `Which category do you want to vote in?\n\n`;
+    CATEGORIES.forEach((cat, i) => {
+      msg += `*${i + 1}.* ${cat.emoji} ${cat.label}\n`;
+    });
+    msg += `\nReply with a number (1-${CATEGORIES.length})\n`;
+    msg += `Or *nominate [business name]* to add a new one`;
+
+    await sendTextMessage(phone, msg);
+    await updateSession(phone, {
+      awardsState: "CATEGORY_SELECTED",
+      lastPincode: pincode,
+      awardsCategories: CATEGORIES,
+    });
+    return;
+  }
+
+  // ---- Step 2: Category selected — show nominees ----
+  if (awardsState === "CATEGORY_SELECTED") {
+    const num = parseInt(tl);
+    const cats = session.awardsCategories || CATEGORIES;
+
+    if (!num || num < 1 || num > cats.length) {
+      await sendTextMessage(phone, `Please reply with a number between 1 and ${cats.length}`);
+      return;
+    }
+
+    const selectedCat = cats[num - 1];
+
+    // Fetch existing nominees from Firestore
+    let nominees = [];
+    if (db) {
+      const snap = await db.collection("awards_nominations")
+        .where("pincode", "==", pincode)
+        .orderBy("votes", "desc")
+        .limit(8)
+        .get();
+      nominees = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    if (nominees.length === 0) {
+      await sendTextMessage(phone,
+        `${selectedCat.emoji} *${selectedCat.label} — ${areaName}*\n\n` +
+        `No nominees yet! Be the first.\n\n` +
+        `Reply: *nominate [business name and area]*\n` +
+        `Example: *nominate Naturals Salon Chamiers Road*`
+      );
+      await updateSession(phone, { awardsState: "start" });
+      return;
+    }
+
+    let msg = `${selectedCat.emoji} *${selectedCat.label}*\n`;
+    msg += `_${areaName} — ${pincode}_\n\n`;
+    msg += `Current nominees:\n\n`;
+    nominees.forEach((n, i) => {
+      msg += `*${i + 1}.* ${n.nomination}\n`;
+      msg += `   ⭐ ${n.votes || 0} votes\n\n`;
+    });
+    msg += `Reply number to vote, or *nominate [name]* to add a new one`;
+
+    await sendTextMessage(phone, msg);
+    await updateSession(phone, {
+      awardsState: "VOTING",
+      selectedCategory: selectedCat.id,
+      selectedCategoryName: selectedCat.label,
+      nomineeList: nominees.map(n => n.id),
+    });
+    return;
+  }
+
+  // ---- Step 3: Cast vote ----
+  if (awardsState === "VOTING") {
+    const num = parseInt(tl);
+    const nomineeList = session.nomineeList || [];
+
+    if (!num || num < 1 || num > nomineeList.length) {
+      await sendTextMessage(phone, `Please reply with a number to vote, or *nominate [name]* to add a new nominee`);
+      return;
+    }
+
+    const nomineeId = nomineeList[num - 1];
+
+    // Check if already voted in this category for this pincode
+    if (db) {
+      const existingVote = await db.collection("awards_votes")
+        .where("phone", "==", phone)
+        .where("pincode", "==", pincode)
+        .where("category", "==", session.selectedCategory)
+        .get();
+
+      if (!existingVote.empty) {
+        await sendTextMessage(phone,
+          `✅ You've already voted in *${session.selectedCategoryName}* for ${areaName}.\n\n` +
+          `Reply *vote ${pincode}* to vote in another category!`
+        );
+        await updateSession(phone, { awardsState: "start" });
+        return;
+      }
+
+      // Record vote
+      await db.collection("awards_votes").add({
+        phone,
+        pincode,
+        category: session.selectedCategory,
+        nomineeId,
+        createdAt: new Date(),
+      });
+
+      // Increment nominee vote count
+      await db.collection("awards_nominations").doc(nomineeId).update({
+        votes: db.FieldValue ? db.FieldValue.increment(1) : 1,
+      });
+    }
+
+    await sendTextMessage(phone,
+      `🗳️ *Vote cast!* Thank you!\n\n` +
+      `You voted in *${session.selectedCategoryName}* for ${areaName}.\n\n` +
+      `📢 Share Gully Awards with your neighbours:\n` +
+      `_Send *vote ${pincode}* to this number_\n\n` +
+      `Reply *vote ${pincode}* to vote in another category\n` +
+      `Results announced at end of quarter 🏆`
+    );
+    await updateSession(phone, { awardsState: "start" });
+    return;
+  }
+
+  // Default
+  await updateSession(phone, { awardsState: "start" });
+  await handleGullyAwards(phone, text, { ...session, awardsState: "start" });
 }
