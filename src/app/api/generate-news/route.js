@@ -9,13 +9,14 @@ export async function POST(request) {
     if (authHeader !== `Bearer ${CRON_SECRET}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    console.log("[generate-news] Starting news generation...");
-    const results = await generateDailyNews();
-    return NextResponse.json({
-      success: true,
-      message: "News generated successfully",
-      results,
-    });
+
+    const body = await request.json().catch(() => ({}));
+    const pincode = body.pincode || null;
+
+    console.log(`[generate-news] Starting — pincode: ${pincode || "all pilot pincodes"}`);
+    const results = await generateDailyNews(pincode);
+
+    return NextResponse.json({ success: true, results });
   } catch (err) {
     console.error("[generate-news] Error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -24,7 +25,9 @@ export async function POST(request) {
 
 export async function GET() {
   return NextResponse.json({
-    message: "Gully News Generator — POST to generate news",
-    pincodes: ["600028", "600040", "600017", "600001", "600004"],
+    message: "Gully News Generator",
+    schedule: "Every 6 hours",
+    pilot_pincodes: ["600028", "600040", "600017", "600001", "600004"],
+    usage: "POST with Authorization: Bearer gully-news-2026",
   });
 }
