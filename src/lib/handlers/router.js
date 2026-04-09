@@ -1068,7 +1068,7 @@ async function handleGullyAwards(phone, text, session) {
     "600003": "Park Town / Edapalayam",
     "600004": "Mylapore / Mandaveli / Santhome",
     "600005": "Chepauk / Triplicane",
-    "600006": "Greams Road / Teynampet West",
+    "600006": "Greams Road / / Thousand Lights / Teynampet West",
     "600007": "Vepery",
     "600008": "Egmore",
     "600009": "Fort St George",
@@ -1080,7 +1080,7 @@ async function handleGullyAwards(phone, text, session) {
     "600015": "Saidapet / Guindy North",
     "600016": "Chennai Airport / Meenambakkam",
     "600017": "T Nagar / Thyagaraya Nagar",
-    "600018": "Teynampet / Abiramapuram",
+    "600018": "Teynampet / Alwarpet",
     "600019": "Tiruvottiyur",
     "600020": "Adyar / Indira Nagar",
     "600021": "Washermanpet / Cemetry Road",
@@ -1089,7 +1089,7 @@ async function handleGullyAwards(phone, text, session) {
     "600024": "Kodambakkam / Rangarajapuram",
     "600025": "Engineering College",
     "600026": "Vadapalani",
-    "600028": "RA Puram / Santhome / Foreshore Estate",
+    "600028": "RA Puram / Boat CLub / Mandaveli / Mandavelipakkam / Santhome / Foreshore Estate",
     "600029": "Aminjikarai",
     "600030": "Shenoy Nagar",
     "600031": "Chetput",
@@ -1106,7 +1106,7 @@ async function handleGullyAwards(phone, text, session) {
     "600042": "Velachery",
     "600043": "Chromepet",
     "600044": "Pallavaram",
-    "600045": "St Thomas Mount",
+    "600045": "Tambaram",
     "600046": "Anakaputhur",
     "600047": "Kundrathur",
     "600048": "Pammal",
@@ -1127,7 +1127,7 @@ async function handleGullyAwards(phone, text, session) {
     "600063": "Tambaram",
     "600064": "Tambaram",
     "600065": "Tambaram",
-    "600066": "Pozhal",
+    "600066": "Puzhal",
     "600067": "Redhills",
     "600068": "Manali",
     "600069": "Manali New Town",
@@ -1245,16 +1245,18 @@ if (tl.startsWith("nominate ")) {
       votes: 0,
     });
   }
-await sendTextMessage(phone,
-  `🏆 *Nomination received!*\n\n` +
-  `"${nomination}" has been nominated for *Best Gully Awards ${pincode}*\n\n` +
-  `Share this with neighbours to get more votes:\n` +
-  `_Send *vote ${pincode}* to this number to vote_\n\n` +
-  `Results announced quarterly. Good luck! 🎉`
-);
-return;
-  }
-
+  await sendTextMessage(phone,
+    `🏆 *Nomination received!*\n\n` +
+    `"${nomination}" has been nominated for *Best Gully Awards ${pincode}*\n\n` +
+    `Share this with neighbours to get more votes:\n` +
+    `_Send *vote ${pincode}* to this number to vote_\n\n` +
+    `Results announced quarterly. Good luck! 🎉`
+  );
+  return;
+  }  // closes nominate block
+  
+  }  // ✅ ADD THIS LINE (THIS IS THE FIX)
+  
 // ---- No pincode — ask for it ----
 if (!pincode || !PINCODES[pincode]) {
   await sendTextMessage(phone,
@@ -1271,6 +1273,8 @@ if (!pincode || !PINCODES[pincode]) {
     `Winners announced quarterly.\n\n` +
     `📍 *Your neighbourhood decides what's best.*`
   );
+  return;
+}
   // All 130 Chennai pincodes
   const PINCODES = {
     "600001": "Chennai Central / Parrys / George Town",
@@ -1278,7 +1282,7 @@ if (!pincode || !PINCODES[pincode]) {
     "600003": "Park Town / Edapalayam",
     "600004": "Mylapore / Mandaveli / Santhome",
     "600005": "Chepauk / Triplicane",
-    "600006": "Greams Road / Teynampet West",
+    "600006": "Greams Road / / Thousand Lights / Teynampet West",
     "600007": "Vepery",
     "600008": "Egmore",
     "600009": "Fort St George",
@@ -1290,7 +1294,7 @@ if (!pincode || !PINCODES[pincode]) {
     "600015": "Saidapet / Guindy North",
     "600016": "Chennai Airport / Meenambakkam",
     "600017": "T Nagar / Thyagaraya Nagar",
-    "600018": "Teynampet / Abiramapuram",
+    "600018": "Teynampet / Alwarpet",
     "600019": "Tiruvottiyur",
     "600020": "Adyar / Indira Nagar",
     "600021": "Washermanpet / Cemetry Road",
@@ -1299,7 +1303,7 @@ if (!pincode || !PINCODES[pincode]) {
     "600024": "Kodambakkam / Rangarajapuram",
     "600025": "Engineering College",
     "600026": "Vadapalani",
-    "600028": "RA Puram / Santhome / Foreshore Estate",
+    "600028": "RA Puram / Boat CLub / Mandaveli / Mandavelipakkam / Santhome / Foreshore Estate",
     "600029": "Aminjikarai",
     "600030": "Shenoy Nagar",
     "600031": "Chetput",
@@ -1316,7 +1320,7 @@ if (!pincode || !PINCODES[pincode]) {
     "600042": "Velachery",
     "600043": "Chromepet",
     "600044": "Pallavaram",
-    "600045": "St Thomas Mount",
+    "600045": "Tambaram",
     "600046": "Anakaputhur",
     "600047": "Kundrathur",
     "600048": "Pammal",
@@ -1337,7 +1341,7 @@ if (!pincode || !PINCODES[pincode]) {
     "600063": "Tambaram",
     "600064": "Tambaram",
     "600065": "Tambaram",
-    "600066": "Pozhal",
+    "600066": "Puzhal",
     "600067": "Redhills",
     "600068": "Manali",
     "600069": "Manali New Town",
@@ -1540,8 +1544,8 @@ if (!pincode || !PINCODES[pincode]) {
     );
     await updateSession(phone, { awardsState: "start" });
     return;
-  }
-
-  // Default
-  await updateSession(phone, { awardsState: "start" });
-  await handleGullyAwards(phone, text, { ...session, awardsState: "start" })
+    }
+    
+    // Default
+    await updateSession(phone, { awardsState: "start" });
+    await handleGullyAwards(phone, text, { ...session, awardsState: "start" });
