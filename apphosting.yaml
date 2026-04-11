@@ -26,7 +26,20 @@ env:
     value: 1014351171761641
     availability:
       - RUNTIME
-
+cat >> apphosting.yaml << 'EOF'
+  - variable: TWILIO_ACCOUNT_SID
+    value: YOUR_TWILIO_SID_HERE
+    availability:
+      - RUNTIME
+  - variable: TWILIO_AUTH_TOKEN
+    secret: TWILIO_AUTH_TOKEN
+    availability:
+      - RUNTIME
+  - variable: TWILIO_WHATSAPP_FROM
+    value: whatsapp:+14155238886
+    availability:
+      - RUNTIME
+EOF
   - variable: GEMINI_API_KEY
     value: AIzaSyCDiRfqhuQ_oEzSuIQJRasgLren__x5png
     availability:
