@@ -23,7 +23,29 @@ export async function sendTextMessage(to, text) {
   }
   return await _sendText(to, text);
 }
-
+async function sendViaTwilio(to, text) {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        "Authorization": "Basic " + Buffer.from(`${accountSid}:${authToken}`).toString("base64"),
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        From: TWILIO_FROM,
+        To: `whatsapp:+${to}`,
+        Body: text,
+      }),
+    }
+  );
+  const data = await response.json();
+  if (!response.ok) console.error("Twilio send error:", JSON.stringify(data));
+  return data;
+}
 async function _sendText(to, text) {
   const response = await fetch(META_API_URL, {
     method: "POST",
