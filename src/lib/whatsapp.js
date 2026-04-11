@@ -13,12 +13,18 @@ const META_MEDIA_URL = `https://graph.facebook.com/${config.meta.apiVersion}`;
 // ============================================
 
 export async function sendTextMessage(to, text) {
-  // WhatsApp text messages max 4096 chars — split if needed
+  if (USE_TWILIO) {
+    if (text.length > 1600) {
+      const parts = splitMessage(text, 1600);
+      for (const part of parts) await sendViaTwilio(to, part);
+      return;
+    }
+    return await sendViaTwilio(to, text);
+  }
+  // Fall back to Meta
   if (text.length > 4000) {
     const parts = splitMessage(text, 4000);
-    for (const part of parts) {
-      await _sendText(to, part);
-    }
+    for (const part of parts) await _sendText(to, part);
     return;
   }
   return await _sendText(to, text);
