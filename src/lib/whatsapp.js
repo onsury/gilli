@@ -2,7 +2,9 @@
 // Meta WhatsApp Cloud API — send messages, download media
 
 import config from "./config.js";
-
+// Detect which provider to use
+const USE_TWILIO = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_FROM = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886";
 const META_API_URL = `https://graph.facebook.com/${config.meta.apiVersion}/${config.meta.phoneNumberId}/messages`;
 const META_MEDIA_URL = `https://graph.facebook.com/${config.meta.apiVersion}`;
 
