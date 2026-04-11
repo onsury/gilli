@@ -60,8 +60,3 @@ EOF
     availability:
       - RUNTIME
     availability:
-      - RUNTIME
-  - variable: CRON_SECRET
-    value: gully-news-2026
-    availability:
-      - RUNTIME
