@@ -9,51 +9,82 @@ import { useFeed } from '../lib/useFeed';
 // ═══════════════════════════════════════════════════════════════
 
 const CHENNAI_PINCODES = [
-  { code: "600001", area: "George Town", zone: "North" },
-  { code: "600002", area: "Egmore", zone: "Central" },
+  { code: "600001", area: "George Town / Parrys", zone: "North" },
+  { code: "600002", area: "Anna Road / Chintadripet", zone: "Central" },
   { code: "600003", area: "Park Town", zone: "Central" },
-  { code: "600004", area: "Mylapore", zone: "South" },
-  { code: "600005", area: "Triplicane", zone: "Central" },
-  { code: "600006", area: "Kilpauk", zone: "Central" },
+  { code: "600004", area: "Mylapore / Mandaveli", zone: "South" },
+  { code: "600005", area: "Chepauk / Triplicane", zone: "Central" },
+  { code: "600006", area: "Greams Road / Teynampet", zone: "Central" },
   { code: "600007", area: "Vepery", zone: "Central" },
-  { code: "600008", area: "Chetpet", zone: "Central" },
-  { code: "600010", area: "Perambur", zone: "North" },
-  { code: "600011", area: "Ayanavaram", zone: "North" },
+  { code: "600008", area: "Egmore", zone: "Central" },
+  { code: "600010", area: "Kilpauk", zone: "Central" },
+  { code: "600011", area: "Perambur / Sembiam", zone: "North" },
   { code: "600012", area: "Perambur Barracks", zone: "North" },
-  { code: "600014", area: "Nandanam", zone: "South" },
-  { code: "600015", area: "Kotturpuram", zone: "South" },
-  { code: "600017", area: "T. Nagar", zone: "South" },
-  { code: "600018", area: "Kodambakkam", zone: "West" },
-  { code: "600020", area: "Adyar", zone: "South" },
-  { code: "600024", area: "Guindy", zone: "South" },
-  { code: "600028", area: "Saidapet", zone: "South" },
+  { code: "600013", area: "Rayapuram / Royapuram", zone: "North" },
+  { code: "600014", area: "Royapettah", zone: "Central" },
+  { code: "600015", area: "Saidapet / Guindy North", zone: "South" },
+  { code: "600017", area: "T Nagar / Thyagaraya Nagar", zone: "South" },
+  { code: "600018", area: "Teynampet / Abiramapuram", zone: "South" },
+  { code: "600019", area: "Tiruvottiyur", zone: "North" },
+  { code: "600020", area: "Adyar / Indira Nagar", zone: "South" },
+  { code: "600021", area: "Washermanpet", zone: "North" },
+  { code: "600023", area: "Aynavaram", zone: "North" },
+  { code: "600024", area: "Kodambakkam", zone: "West" },
+  { code: "600026", area: "Vadapalani", zone: "West" },
+  { code: "600028", area: "RA Puram / Santhome / Foreshore", zone: "South" },
+  { code: "600029", area: "Aminjikarai", zone: "Central" },
+  { code: "600030", area: "Shenoy Nagar", zone: "Central" },
+  { code: "600031", area: "Chetput", zone: "Central" },
+  { code: "600032", area: "Guindy / Ekkaduthangal", zone: "South" },
   { code: "600033", area: "West Mambalam", zone: "South" },
-  { code: "600034", area: "Ashok Nagar", zone: "West" },
-  { code: "600035", area: "ICF Colony", zone: "North" },
-  { code: "600036", area: "Velachery", zone: "South" },
-  { code: "600040", area: "Velachery East", zone: "South" },
-  { code: "600042", area: "Nungambakkam", zone: "Central" },
-  { code: "600044", area: "Chromepet", zone: "South" },
-  { code: "600045", area: "Pallavaram", zone: "South" },
-  { code: "600050", area: "Alwarpet", zone: "South" },
-  { code: "600053", area: "Shenoy Nagar", zone: "Central" },
-  { code: "600059", area: "Besant Nagar", zone: "South" },
-  { code: "600078", area: "Porur", zone: "West" },
-  { code: "600083", area: "Perungudi", zone: "South" },
-  { code: "600086", area: "Mambalam", zone: "South" },
-  { code: "600088", area: "Vadapalani", zone: "West" },
-  { code: "600092", area: "Medavakkam", zone: "South" },
-  { code: "600093", area: "Neelankarai", zone: "South" },
-  { code: "600095", area: "Sholinganallur", zone: "South" },
-  { code: "600096", area: "Palavakkam", zone: "South" },
-  { code: "600097", area: "Thoraipakkam", zone: "South" },
-  { code: "600100", area: "Tambaram", zone: "South" },
-  { code: "600107", area: "Koyambedu", zone: "West" },
-  { code: "600113", area: "Ambattur", zone: "North" },
-  { code: "600116", area: "Anna Nagar", zone: "West" },
-  { code: "600117", area: "Anna Nagar West", zone: "West" },
-  { code: "600118", area: "Mogappair", zone: "North" },
-  { code: "600119", area: "Thirumangalam", zone: "West" },
+  { code: "600034", area: "Nungambakkam", zone: "Central" },
+  { code: "600035", area: "Nandanam", zone: "South" },
+  { code: "600036", area: "IIT Madras / Taramani", zone: "South" },
+  { code: "600037", area: "Mogappair", zone: "West" },
+  { code: "600038", area: "ICF Colony", zone: "North" },
+  { code: "600039", area: "Vyasarpadi", zone: "North" },
+  { code: "600040", area: "Anna Nagar", zone: "West" },
+  { code: "600041", area: "Tiruvanmiyur / Palavakkam", zone: "South" },
+  { code: "600042", area: "Velachery", zone: "South" },
+  { code: "600043", area: "Chromepet", zone: "South" },
+  { code: "600044", area: "Pallavaram", zone: "South" },
+  { code: "600049", area: "Villivakkam", zone: "North" },
+  { code: "600050", area: "Padi", zone: "North" },
+  { code: "600051", area: "Madhavaram", zone: "North" },
+  { code: "600053", area: "Ambattur", zone: "West" },
+  { code: "600058", area: "Ambattur Industrial Estate", zone: "West" },
+  { code: "600060", area: "Madhavaram", zone: "North" },
+  { code: "600061", area: "Nanganallur / Pazhavanthangal", zone: "South" },
+  { code: "600076", area: "Korattur", zone: "West" },
+  { code: "600078", area: "KK Nagar", zone: "West" },
+  { code: "600079", area: "Sowcarpet / Mint", zone: "North" },
+  { code: "600081", area: "Tondiarpet", zone: "North" },
+  { code: "600082", area: "Agaram / GKM Colony", zone: "North" },
+  { code: "600083", area: "Ashok Nagar / Jafferkhanpet", zone: "West" },
+  { code: "600084", area: "Purasawalkam", zone: "Central" },
+  { code: "600085", area: "Kotturpuram", zone: "South" },
+  { code: "600086", area: "Gopalapuram", zone: "South" },
+  { code: "600087", area: "Valasaravakkam", zone: "West" },
+  { code: "600088", area: "Adambakkam", zone: "South" },
+  { code: "600089", area: "Ramapuram", zone: "West" },
+  { code: "600090", area: "Besant Nagar", zone: "South" },
+  { code: "600091", area: "Madipakkam", zone: "South" },
+  { code: "600092", area: "Virugambakkam / Koyambedu", zone: "West" },
+  { code: "600093", area: "Saligramam", zone: "West" },
+  { code: "600094", area: "Choolaimedu", zone: "Central" },
+  { code: "600095", area: "Maduravoyal", zone: "West" },
+  { code: "600096", area: "Perungudi", zone: "South" },
+  { code: "600097", area: "Karapakkam", zone: "South" },
+  { code: "600099", area: "Kolathur", zone: "North" },
+  { code: "600101", area: "Anna Nagar Western Extn", zone: "West" },
+  { code: "600102", area: "Anna Nagar East", zone: "West" },
+  { code: "600107", area: "Koyambedu / Nerkundram", zone: "West" },
+  { code: "600113", area: "Taramani / Tidel Park", zone: "South" },
+  { code: "600115", area: "Injambakkam / Neelangarai", zone: "South" },
+  { code: "600116", area: "Porur / Alapakkam", zone: "West" },
+  { code: "600118", area: "Kodungaiyur", zone: "North" },
+  { code: "600119", area: "Sholinganallur", zone: "South" },
+  { code: "600125", area: "Mugalivakkam / Manapakkam", zone: "West" },
 ];
 
 const CATEGORIES = [
@@ -80,6 +111,15 @@ const FEED = [
     pincodes: ["600004"], area: "Mylapore", category: "temple",
     engagement: { views: 12400, shares: 340 }, publishedAt: "2 hours ago",
     source: "Gully Heritage Desk", templeOfDay: true, featured: true,
+  },
+  {
+    id: 99, type: "awards",
+    title: "🏆 Gully Awards 2026 — Vote for the Best in Your Neighbourhood",
+    summary: "Who is the best salon in RA Puram? The most trusted kirana in Anna Nagar? The cleanest street in Mylapore? You decide. India's first pincode-based neighbourhood awards — voted entirely by residents.",
+    pincodes: ["600028", "600040", "600017", "600001", "600004"],
+    area: "All Chennai", category: "culture",
+    engagement: { views: 4200, shares: 890 }, publishedAt: "New",
+    source: "Gully Awards", awards: true,
   },
   {
     id: 2, type: "article",
@@ -410,7 +450,45 @@ function VideoCard({ item }) {
     </article>
   );
 }
-
+function AwardsCard({ item }) {
+  return (
+    <article style={{
+      background: "linear-gradient(135deg, #1a1a2e, #2d1b4e)",
+      borderRadius: 12, overflow: "hidden", cursor: "pointer",
+      border: "1.5px solid #C8912E"
+    }}
+    onClick={() => window.location.href = '/awards'}>
+      <div style={{ padding: "20px 24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+          <span style={{ fontSize: 28 }}>🏆</span>
+          <div>
+            <div style={{ fontFamily: f.sans, fontSize: 10, fontWeight: 700, color: "#C8912E", letterSpacing: "0.1em", textTransform: "uppercase" }}>Now Open</div>
+            <div style={{ fontFamily: f.serif, fontSize: 20, fontWeight: 800, color: "#FFF" }}>Gully Awards 2026</div>
+          </div>
+        </div>
+        <p style={{ fontFamily: f.sans, fontSize: 14, color: "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: "0 0 16px" }}>
+          India's first pincode-based neighbourhood awards. Vote for the best salon, restaurant, kirana, park, street, apartment, and school in your area.
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {["💇 Best Salon", "🍱 Best Restaurant", "🛒 Best Kirana", "🌳 Best Park", "🏢 Best Apartment"].map(cat => (
+            <span key={cat} style={{ background: "rgba(255,255,255,0.1)", color: "#FFF", padding: "4px 10px", borderRadius: 12, fontFamily: f.sans, fontSize: 11, fontWeight: 500 }}>{cat}</span>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button style={{ background: "#C8912E", color: "#FFF", border: "none", borderRadius: 20, padding: "8px 20px", fontFamily: f.sans, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+            Vote Now →
+          </button>
+          <button style={{ background: "transparent", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 20, padding: "8px 20px", fontFamily: f.sans, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+            Nominate a Business
+          </button>
+        </div>
+        <div style={{ fontFamily: f.sans, fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 12 }}>
+          Open to all 130 Chennai pincodes · Winners announced quarterly
+        </div>
+      </div>
+    </article>
+  );
+}
 function StdCard({ item }) {
   const cc = catColors[item.category] || C.accent;
   return (
@@ -436,6 +514,7 @@ function StdCard({ item }) {
 }
 
 function Card({ item }) {
+  if (item.awards) return <AwardsCard item={item} />;
   if (item.templeOfDay) return <TempleCard item={item} />;
   if (item.breaking) return <BreakingCard item={item} />;
   if (item.gilliDeal) return <DealCard item={item} />;
@@ -443,9 +522,26 @@ function Card({ item }) {
   if (item.hasVideo) return <VideoCard item={item} />;
   return <StdCard item={item} />;
 }
-
 // ─── SIDEBAR ───
-
+function AwardsSidebar() {
+  return (
+    <div style={{ background: "linear-gradient(135deg, #1a1a2e, #2d1b4e)", border: "1px solid #C8912E", borderRadius: 12, padding: 18 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+        <span style={{ fontSize: 22 }}>🏆</span>
+        <div>
+          <div style={{ fontFamily: f.serif, fontSize: 16, fontWeight: 700, color: "#C8912E" }}>Gully Awards</div>
+          <div style={{ fontFamily: f.sans, fontSize: 10, color: "rgba(255,255,255,0.5)", letterSpacing: "0.06em", textTransform: "uppercase" }}>2026 — Now Open</div>
+        </div>
+      </div>
+      <p style={{ fontFamily: f.sans, fontSize: 13, color: "rgba(255,255,255,0.7)", lineHeight: 1.5, margin: "0 0 14px" }}>
+        Vote for the best businesses and spaces in your pincode. Winners get the Best Gully 2026 award.
+      </p>
+      <a href="/awards" style={{ display: "block", background: "#C8912E", color: "#FFF", border: "none", borderRadius: 10, padding: "10px", fontFamily: f.sans, fontSize: 13, fontWeight: 700, cursor: "pointer", textAlign: "center", textDecoration: "none" }}>
+        Vote Now →
+      </a>
+    </div>
+  );
+}
 function GilliSidebar() {
   const deals = FEED.filter(i => i.gilliDeal);
   return (
@@ -467,6 +563,7 @@ function GilliSidebar() {
       <button style={{ width: "100%", background: C.gilli, color: "#FFF", border: "none", borderRadius: 10, padding: 10, fontFamily: f.sans, fontSize: 13, fontWeight: 600, cursor: "pointer", marginTop: 14 }}>
         Browse All Gilli Deals →
       </button>
+     
     </div>
   );
 }
@@ -636,9 +733,10 @@ export default function GullyHome() {
             )}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 18, position: "sticky", top: 120 }}>
-            <GilliSidebar />
-            <ZoneGrid onSelect={(code) => setPin(code)} />
-          </div>
+  <AwardsSidebar />
+  <GilliSidebar />
+  <ZoneGrid onSelect={(code) => setPin(code)} />
+</div>
         </div>
   
         <Footer />
