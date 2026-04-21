@@ -8,12 +8,17 @@ service cloud.firestore {
       allow create: if request.resource.data.votes == 0
                  && request.resource.data.pincode is string
                  && request.resource.data.nomination is string;
-      allow update, delete: if false;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['votes'])
+                 && request.resource.data.votes == resource.data.votes + 1;
+      allow delete: if false;
     }
 
     match /awards_votes/{id} {
       allow read: if false;
-      allow write: if false;
+      allow create: if request.resource.data.nomination_id is string
+                 && request.resource.data.voter is string
+                 && request.resource.data.pincode is string;
+      allow update, delete: if false;
     }
 
     match /businesses/{id} {
