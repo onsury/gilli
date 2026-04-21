@@ -10,9 +10,9 @@ try {
   if (getApps().length === 0) {
     initializeApp({
       credential: cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+        projectId: process.env.FB_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FB_ADMIN_CLIENT_EMAIL,
+        privateKey: process.env.FB_ADMIN_PRIVATE_KEY?.replace(/\\n/g, "\n"),
       }),
     });
   }

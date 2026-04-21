@@ -26,6 +26,11 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /feed/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     match /news/{id} {
       allow read: if true;
       allow write: if false;
