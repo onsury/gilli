@@ -81,3 +81,13 @@ env:
     secret: RAZORPAY_KEY_SECRET
     availability:
       - RUNTIME
+  - variable: INVOICE_TOKEN_SECRET
+    secret: INVOICE_TOKEN_SECRET
+  - variable: INVOICE_TOKEN_SECRET
+    secret: INVOICE_TOKEN_SECRET
+    availability:
+      - RUNTIME
+  - variable: INVOICE_TOKEN_SECRET
+    secret: INVOICE_TOKEN_SECRET
+    availability:
+      - RUNTIME

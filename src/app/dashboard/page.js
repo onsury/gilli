@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { sanitiseShopEdit } from '../../lib/sanitise';
 import { collection, query, where, getDocs, updateDoc, doc, orderBy } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase-client';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
@@ -82,7 +83,8 @@ function DashboardContent() {
   async function saveEdit(shopId) {
     setSaving(true);
     try {
-      await updateDoc(doc(clientDb, 'businesses', shopId), { ...editData, owner_edited_at: new Date().toISOString() });
+      const cleanData = sanitiseShopEdit(editData);
+      await updateDoc(doc(clientDb, 'businesses', shopId), { ...cleanData, owner_edited_at: new Date().toISOString() });
       setEditing(null);
       loadData(authPhone);
     } catch (e) { alert('Save failed: ' + e.message); }
