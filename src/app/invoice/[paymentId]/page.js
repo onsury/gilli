@@ -1,4 +1,5 @@
 import { adminDb } from '../../../lib/firebase-admin';
+import { verifyInvoiceToken } from '../../../lib/invoiceToken';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
@@ -7,8 +8,20 @@ export async function generateMetadata({ params }) {
   return { title: 'Invoice ' + paymentId + ' -- Gully / Madraz Buzz Media' };
 }
 
-export default async function InvoicePage({ params }) {
+export default async function InvoicePage({ params, searchParams }) {
   const { paymentId } = await params;
+  const token = (await searchParams)?.t || '';
+  if (!verifyInvoiceToken(paymentId, token)) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', background: '#faf9f6' }}>
+        <div style={{ textAlign: 'center', padding: 40 }}>
+          <div style={{ fontSize: 48, fontWeight: 900, marginBottom: 16 }}>Gully</div>
+          <p style={{ fontFamily: 'Arial, sans-serif', fontSize: 15, color: '#555', marginBottom: 24 }}>This invoice link is invalid or has expired.</p>
+          <a href="/dashboard" style={{ fontFamily: 'Arial, sans-serif', fontSize: 14, color: '#e85d26' }}>Go to your dashboard</a>
+        </div>
+      </div>
+    );
+  }
   const snap = await adminDb.collection('payments').where('paymentId', '==', paymentId).limit(1).get();
   if (snap.empty) notFound();
   const payment = snap.docs[0].data();

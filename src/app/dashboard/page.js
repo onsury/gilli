@@ -1,8 +1,7 @@
 'use client';
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { sanitiseShopEdit } from '../../lib/sanitise';
-import { collection, query, where, getDocs, updateDoc, doc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { clientDb } from '../../lib/firebase-client';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from 'firebase/auth';
 import { clientApp } from '../../lib/firebase-client';
@@ -83,7 +82,13 @@ function DashboardContent() {
   async function saveEdit(shopId) {
     setSaving(true);
     try {
-      const cleanData = sanitiseShopEdit(editData);
+      const cleanData = {};
+      if (editData.owner_description !== undefined) cleanData.owner_description = String(editData.owner_description || '').slice(0, 500).replace(/<[^>]*>/g, '').trim();
+      if (editData.owner_hours !== undefined) cleanData.owner_hours = String(editData.owner_hours || '').slice(0, 100).replace(/<[^>]*>/g, '').trim();
+      if (editData.owner_phone !== undefined) cleanData.owner_phone = String(editData.owner_phone || '').replace(/[^\d\s+\-()]/g, '').slice(0, 20);
+      if (editData.owner_whatsapp !== undefined) cleanData.owner_whatsapp = String(editData.owner_whatsapp || '').replace(/[^\d\s+\-()]/g, '').slice(0, 20);
+      if (editData.owner_website !== undefined) { const u = String(editData.owner_website || '').trim(); cleanData.owner_website = /^https?:\/\//i.test(u) ? u.slice(0, 200) : ''; }
+      if (editData.owner_instagram !== undefined) cleanData.owner_instagram = String(editData.owner_instagram || '').slice(0, 60).replace(/<[^>]*>/g, '').trim();
       await updateDoc(doc(clientDb, 'businesses', shopId), { ...cleanData, owner_edited_at: new Date().toISOString() });
       setEditing(null);
       loadData(authPhone);
