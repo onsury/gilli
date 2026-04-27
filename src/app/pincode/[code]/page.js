@@ -46,15 +46,6 @@ const PINCODE_AREAS = {
   '600119': 'Sholinganallur',
 };
  
-function isMobile(phone) {
-  if (!phone || phone.trim() === '-' || phone.trim() === '') return false;
-  const digits = phone.replace(/\D/g, '');
-  let local = digits;
-  if (local.startsWith('91') && local.length === 12) local = local.slice(2);
-  if (local.startsWith('0') && local.length === 11) local = local.slice(1);
-  return /^[6-9]\d{9}$/.test(local);
-}
-
 function isValidPincode(p) {
   return /^[1-8]\d{5}$/.test(p);
 }
