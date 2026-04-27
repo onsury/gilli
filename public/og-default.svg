@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fafaf7"/>
+      <stop offset="1" stop-color="#f0ebe0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="600" y="260" font-family="Georgia, serif" font-size="140" font-weight="800" fill="#1a1a1a" text-anchor="middle" letter-spacing="-6">Gully</text>
+  <text x="600" y="330" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#e85d26" text-anchor="middle" letter-spacing="6">CHENNAI · BY PINCODE</text>
+  <line x1="440" y1="380" x2="760" y2="380" stroke="#1a1a1a" stroke-width="2"/>
+  <text x="600" y="450" font-family="Georgia, serif" font-size="32" font-style="italic" fill="#333" text-anchor="middle">The shops of your neighbourhood,</text>
+  <text x="600" y="495" font-family="Georgia, serif" font-size="32" font-style="italic" fill="#333" text-anchor="middle">honoured by the people who shop there.</text>
+  <text x="600" y="570" font-family="Arial, sans-serif" font-size="18" fill="#888" text-anchor="middle" letter-spacing="2">mygully.in</text>
+</svg>

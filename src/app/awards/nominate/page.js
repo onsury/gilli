@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { parseVideoUrl } from '../../../lib/video';
 import { useRouter } from 'next/navigation';
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { clientDb as db } from '../../../lib/firebase-client';
@@ -43,6 +44,7 @@ export default function Nominate() {
   const [ownerName, setOwnerName] = useState('');
   const [businessPhone, setBusinessPhone] = useState('');
   const [phone, setPhone] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [status, setStatus] = useState('');
   const [submitting, setSubmitting] = useState(false);
  
@@ -103,6 +105,7 @@ export default function Nominate() {
         owner_name: ownerName.trim() || '',
         business_phone: businessPhone.trim() || '',
         nominated_by: phone.trim(),
+        video_url: videoUrl.trim() || '',
         votes: 0,
         source: 'web',
         created_at: serverTimestamp(),
@@ -204,7 +207,16 @@ export default function Nominate() {
         style={inputStyle}
       />
       <p style={{ fontSize: 11, color: '#888', margin: '4px 0 0' }}>So we can thank you and keep duplicates out.</p>
- 
+
+      <label style={{ marginTop: 20, display: 'block', fontSize: 14, fontWeight: 600 }}>Video link <span style={{ fontWeight: 400, color: '#888' }}>(YouTube or Instagram Reel, optional)</span></label>
+      <input
+        value={videoUrl}
+        onChange={e => setVideoUrl(e.target.value)}
+        placeholder='https://youtube.com/... or https://instagram.com/reel/...'
+        style={inputStyle}
+      />
+      <p style={{ fontSize: 11, color: '#888', margin: '4px 0 0' }}>Share a video of this shop if you have one on YouTube or Instagram.</p>
+
       <button
         onClick={submit}
         disabled={submitting || !pincodeValid}

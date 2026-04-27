@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import { adminDb } from '../../../lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { PINCODE_AREAS } from '../../../lib/chennai-pincodes';
  
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'gully_gilli_2026';
+const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN ;
  
 function isValidPincode(p) {
   return /^600\d{3}$/.test(p);
@@ -28,7 +29,22 @@ export async function GET(req) {
 // POST — incoming messages
 export async function POST(req) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+    
+    // Verify Meta signature — prevents forged payloads
+    const signature = req.headers.get('x-hub-signature-256');
+    const appSecret = process.env.META_APP_SECRET;
+    if (!appSecret) {
+      console.error('META_APP_SECRET not set — rejecting webhook');
+      return new Response('Unauthorised', { status: 401 });
+    }
+    const expected = 'sha256=' + crypto.createHmac('sha256', appSecret).update(rawBody).digest('hex');
+    if (!signature || signature !== expected) {
+      console.error('Invalid webhook signature');
+      return new Response('Unauthorised', { status: 401 });
+    }
+    
+    const body = JSON.parse(rawBody);
     let from = '', text = '';
  
     if (body.entry?.[0]?.changes) {

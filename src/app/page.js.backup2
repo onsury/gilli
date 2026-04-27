@@ -13,7 +13,7 @@ const CITIES = [
     { code: '600034', area: 'Nungambakkam' },
     { code: '600040', area: 'Anna Nagar' },
     { code: '600042', area: 'Velachery' },
-    
+    { code: '600039', area: 'Vyasarpadi' },
   ]},
   { id: 'mumbai',    label: 'Mumbai',    pincodes: [
     { code: '400001', area: 'Fort / Churchgate' },
@@ -72,7 +72,14 @@ const CITIES = [
   ]},
 ];
  
-
+const CITY_COUNTS = {
+  chennai:   '16,417',
+  mumbai:    '3,555',
+  bangalore: '4,053',
+  hyderabad: '2,949',
+  delhi:     'coming soon',
+  kolkata:   'coming soon',
+};
  
 function isValidPincode(p) {
   return /^[1-8]\d{5}$/.test(p);
@@ -142,7 +149,7 @@ export default function Home() {
           </div>
           <div style={s.rule} />
           <div style={s.dateline}>
-            EST. 2026 · INDIA’S NEIGHBOURHOOD SHOP DIRECTORY
+            EST. 2026  &middot;  INDIA&apos;S NEIGHBOURHOOD SHOP DIRECTORY  &middot;  26,974 SHOPS ACROSS 6 CITIES
           </div>
         </header>
  
@@ -153,8 +160,8 @@ export default function Home() {
             honoured by the people who shop there.
           </h1>
           <p style={s.heroSubtitle}>
-            India’s first pincode-based neighbourhood directory.
-           
+            India&apos;s first pincode-organised neighbourhood shop directory.
+            Find, support, and nominate the shops that define your gully.
           </p>
  
           <div className="input-wrap" style={s.inputWrap}>
@@ -170,7 +177,7 @@ export default function Home() {
               aria-label="Enter pincode"
             />
             <button onClick={handleSubmit} style={s.submitBtn} aria-label="Find neighbourhood shops">
-              Find your neighbourhood {'→'}
+              Find your neighbourhood &rarr;
             </button>
           </div>
           {error && <p style={s.error} role="alert">{error}</p>}
@@ -199,7 +206,7 @@ export default function Home() {
                   ...s.cityCount,
                   color: activeCity === c.id ? '#e85d26' : '#bbb',
                 }}>
-                  
+                  {CITY_COUNTS[c.id]}
                 </span>
               </button>
             ))}
@@ -210,7 +217,7 @@ export default function Home() {
               <Link key={p.code} href={'/pincode/' + p.code} style={s.pincodeCard}>
                 <span style={s.pincodeCode}>{p.code}</span>
                 <span style={s.pincodeArea}>{p.area}</span>
-                <span style={s.pincodeArrow}>{'→'}</span>
+                <span style={s.pincodeArrow}>-></span>
               </Link>
             ))}
           </div>
@@ -226,13 +233,13 @@ export default function Home() {
               <span style={s.archiveKicker}>Heritage  &middot;  Chennai</span>
               <span style={s.archiveTitle}>The Ten Names of Chennai</span>
               <span style={s.archiveDesc}>From Mylapore to Madraspatnam -- the city&apos;s layered identity across 2,000 years.</span>
-              <span style={s.archiveReadMore}>{'Read →'}</span>
+              <span style={s.archiveReadMore}>Read &rarr;</span>
             </Link>
             <Link href="/chennai/vyasarpadi" style={s.archiveCard}>
               <span style={s.archiveKicker}>Heritage  &middot;  Pincode 600039</span>
               <span style={s.archiveTitle}>Vyasarpadi</span>
               <span style={s.archiveDesc}>The first train in South India left from here. Gaana music was born in its lanes. For a place no one talks about, a great deal of history.</span>
-              <span style={s.archiveReadMore}>{'Read →'}</span>
+              <span style={s.archiveReadMore}>Read &rarr;</span>
             </Link>
           </div>
         </section>
@@ -262,7 +269,7 @@ export default function Home() {
             </div>
             <div style={s.manifestoStats}>
               <div style={s.statBlock}>
-                
+                <div style={s.statNumber}>26,974</div>
                 <div style={s.statLabel}>Shops listed</div>
               </div>
               <div style={s.statDivider} />
@@ -294,7 +301,7 @@ export default function Home() {
                 Know a shop that deserves recognition in your pincode?
                 Nominate it for the Best Gully Awards 2026.
               </div>
-              <div style={s.actionCta}>{'Nominate now →'}</div>
+              <div style={s.actionCta}>Nominate now &rarr;</div>
             </Link>
             <Link href="/awards" style={s.actionSecondary}>
               <div style={s.actionIcon}></div>
@@ -303,7 +310,7 @@ export default function Home() {
                 Chennai&apos;s first pincode-based neighbourhood business awards.
                 See who&apos;s winning in your area.
               </div>
-              <div style={s.actionCta}>{'View leaderboard →'}</div>
+              <div style={s.actionCta}>View leaderboard &rarr;</div>
             </Link>
           </div>
         </section>
@@ -323,7 +330,7 @@ export default function Home() {
             </div>
           </div>
           <div style={s.footerCopy}>
-            mygully.in &middot; India &middot; 2026
+            mygully.in  &middot;  India  &middot;  2026  &middot;  Built by SmartDNA Business Intelligence & Advisory, Chennai
           </div>
         </footer>
  
@@ -593,8 +600,8 @@ const s = {
   manifestoSection: { marginBottom: 52 },
   manifestoGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: 32,
+    gridTemplateColumns: '1fr 220px',
+    gap: 40,
     alignItems: 'start',
   },
   manifestoText: {},
@@ -608,7 +615,6 @@ const s = {
   manifestoStats: {
     borderLeft: '2px solid #e85d26',
     paddingLeft: 28,
-    minWidth: 0,
   },
   statBlock: { paddingBottom: 20 },
   statNumber: {
@@ -728,4 +734,3 @@ const s = {
     letterSpacing: '0.05em',
   },
 };
- 

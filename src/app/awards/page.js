@@ -5,9 +5,10 @@ import { useSearchParams } from 'next/navigation';
 import { collection, query, where, orderBy, getDocs, limit, doc, updateDoc, setDoc, increment } from 'firebase/firestore';
 import { clientDb as db } from '../../lib/firebase-client';
 import { PINCODE_AREAS } from '../../lib/chennai-pincodes';
+import { parseVideoUrl } from '../../lib/video';
  
 function isValidPincode(p) {
-  return /^600\d{3}$/.test(p);
+  return /^[1-8]\d{5}$/.test(p);
 }
  
 function mostCommonArea(nominees) {
@@ -252,6 +253,17 @@ function AwardsPageInner() {
                   <div style={{ fontSize: 11, color: '#999' }}>votes</div>
                 </div>
               </div>
+              {n.video_url && parseVideoUrl(n.video_url) && (
+                <div style={{ marginTop: 12, position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: 8, background: '#000' }}>
+                  <iframe
+                    src={parseVideoUrl(n.video_url).embedUrl}
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                    allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                    allowFullScreen
+                    loading='lazy'
+                  />
+                </div>
+              )}
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                 <button
                   onClick={() => vote(n.id)}

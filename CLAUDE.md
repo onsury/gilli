@@ -1,124 +1,99 @@
-GULLY + GILLI PLATFORM
-Project Overview
-Gully/Gilli is a hyperlocal news and commerce platform for Chennai,
-organised by pincode. The web app is live. The platform has two layers:
+# CLAUDE.md — mygully.in Context File
+# Read this at the start of every session
 
-Gully — hyperlocal neighbourhood news, curated by pincode
-Gilli — WhatsApp-based local commerce for Chennai neighbourhood shops
+## Project
+mygully.in — India's first pincode-based neighbourhood shop directory
+Built by O N Suryanarayanan, SmartDNA Business Intelligence & Advisory, Chennai
+Company: Madraz Buzz Media (umbrella brand)
+Email: hello@mygully.in
 
-Tech Stack
+## Stack
+- Next.js 15 + Turbopack
+- Firebase App Hosting (asia-southeast1), project: gilli-app
+- Firestore (default database, asia-south1)
+- Firebase Phone Auth
+- GitHub: onsury/gilli
+- Repo: ~/gilli
+- Deploy: cd ~/gilli && firebase deploy --only apphosting
 
-Framework: Next.js 16.1.6 (App Router) with Turbopack
-Frontend: React, single-file component (GullyHome.jsx)
-Backend: Firebase (Firestore, Firebase Auth, Cloud Functions)
-Database: Firebase Data Connect (GraphQL schema in /dataconnect)
-APIs: WhatsApp Webhook, News Curation API
-Billing: Excel/Tally/Busy/Marg/Vyapar parser (bill-generator.js)
-Deployment: Firebase App Hosting (apphosting.yaml) + Vercel config present
-Environment: .env.local for all secrets
+## Key URLs
+- Production: https://mygully.in
+- Firebase Console: console.firebase.google.com/project/gilli-app
+- Admin panel: mygully.in/admin (superadmin: +919566075910)
+- Shop owner dashboard: mygully.in/dashboard
+- Premium upgrade: mygully.in/premium?businessId=X&name=Y&phone=Z
+- Invoice: mygully.in/invoice/[paymentId]
 
-File Structure
-/src
-  /app
-    page.js                        ← Main entry point
-    layout.js                      ← Root layout
-    globals.css
-    /api
-      /curate-news/route.js        ← News curation API endpoint
-      /webhook/route.js            ← WhatsApp webhook endpoint
-  /components
-    GullyHome.jsx                  ← ENTIRE frontend — single component file
-  /lib
-    firebase.js                    ← Firebase server-side config
-    firebase-client.js             ← Firebase client-side config
-    useFeed.js                     ← News feed hook
-    whatsapp.js                    ← WhatsApp integration logic
-    config.js                      ← Global config (pincodes, constants)
-    /billing
-      bill-generator.js            ← Billing output generator
-    /parsers
-      excel-parser.js              ← Parses Busy/Marg/Tally/Vyapar exports
-    /handlers
-      router.js                    ← WhatsApp message router
-/dataconnect
-  schema/schema.gql                ← Data Connect GraphQL schema
-  seed_data.gql                    ← Seed data
-.idx/dev.nix                       ← Firebase Studio environment config
-.idx/mcp.json                      ← MCP server config (Firebase tools)
-firebase.json                      ← Firebase project config
-apphosting.yaml                    ← Firebase App Hosting config
-.env.local                         ← All secrets — DO NOT MODIFY
-Current Status
-COMPLETE ✅
+## Data
+- 33,287 shops across 6 cities in Firestore businesses collection
+- Cities: Chennai (16,417), Mumbai (3,555), Bangalore (4,053), Hyderabad (2,949), Delhi (4,057), Kolkata (2,256)
+- Scraper scripts: C:\gully-scraper\ on Windows
+- Golden Chennai shops use tel/mobile fields (not phone)
+- Google Places shops use phone field
 
-Web app fully live and running on Firebase App Hosting
-Pincode selector — all Chennai pincodes mapped with area names
-Gully news feed — displays neighbourhood news by pincode
-Ads section — working on the web app
-Header with date display (hydration fix applied 07-03-2026)
-WhatsApp webhook endpoint — route exists at /api/webhook
-News curation API — endpoint exists at /api/curate-news
-Billing parsers — Excel, Tally, Busy, Marg, Vyapar import logic built
-Firebase Data Connect schema — defined
+## Firestore Collections
+- businesses: main shop directory
+- payments: Razorpay payment records
+- analytics_events: page/click tracking
+- awards_nominations: Best Gully Awards
+- awards_votes: nomination votes
+- claim_audit: shop claim log
 
-IN PROGRESS 🔄
+## Payment
+- Razorpay test mode active (live approval pending 3-4 days)
+- Premium listing: Rs.499/month
+- Secrets stored in Firebase Secret Manager: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
+- Payment flow: /premium -> create-order API -> Razorpay -> verify API -> Firestore update
 
-WhatsApp news delivery — webhook exists but Gully news content
-is NOT yet being pushed to WhatsApp users
-This is the #1 current priority
+## Key Files
+- src/app/page.js — homepage (multi-city, 6 city tabs)
+- src/app/pincode/[code]/page.js — pincode listing page
+- src/app/shop/[businessId]/page.js — shop detail page
+- src/app/admin/page.js — superadmin dashboard
+- src/app/dashboard/page.js — shop owner dashboard
+- src/app/premium/page.js — premium upgrade page
+- src/app/invoice/[paymentId]/page.js — invoice page
+- src/app/api/payment/create-order/route.js — Razorpay order creation
+- src/app/api/payment/verify/route.js — payment verification
+- src/app/api/whatsapp/route.js — WhatsApp webhook
+- src/lib/analytics.js — Firestore-based analytics tracking
+- src/lib/firebase-client.js — Firebase client SDK
+- src/lib/firebase-admin.js — Firebase Admin SDK
+- src/lib/cities.js — cityFromPincode() helper
+- firestore.rules — security rules
+- apphosting.yaml — Firebase App Hosting config with secrets
 
-NOT STARTED ❌
+## Design System
+- Font: Playfair Display (headings) + Arial/Inter (body)
+- Primary color: #e85d26 (orange)
+- Background: #faf9f6 (warm off-white)
+- Dark: #1a1a1a
+- Brand line: "Real People | Real Conversations"
+- Admin dashboard: dark theme (#0f0f0f background)
+- No border-radius on inputs/buttons (editorial aesthetic)
 
-WhatsApp news broadcast by pincode — user subscribes to their
-pincode, receives daily Gully news digest on WhatsApp
-Shop listings on web — local shops browsable by pincode
-Commerce features — shop catalogue, ordering via WhatsApp
-Billing software integration — shops upload Busy/Tally exports
-to auto-generate WhatsApp catalogue
-User registration/login flow
-Admin panel for news curation
+## Important Decisions
+- Phone numbers: mobile -> WhatsApp button, landline -> Call button, none -> Claim listing
+- isMobile() handles leading zeros and country codes
+- Golden Chennai records: phone stored as tel/mobile fields
+- Analytics: write-only from client, read via admin SDK
+- Payments: write via backend only, read by authenticated phone users
+- No shop counts shown on homepage (decision: not important)
+- SmartDNA removed from all pages (company not yet registered)
+- Madraz Buzz Media is the registered entity for mygully.in
 
-Decisions Already Made
+## Pending
+- Razorpay live keys (approval in 3-4 days)
+- Meta WhatsApp Business API activation
+- Twilio call bridging for landline shops
+- Invoice WhatsApp auto-delivery
+- KVB Madraz Buzz Media account revival
+- Billing account cleanup (8 accounts, consolidate)
+- gilli-app project should be linked to O N Suryanarayanan billing account (01E700)
+- Currently on Firebase Payment billing account (01E267) — switch needed
 
-Single component architecture — GullyHome.jsx holds all UI
-Firebase App Hosting for deployment — NOT Vercel (ignore vercel config)
-WhatsApp as the commerce and news delivery channel — not a native app
-Pincode-first architecture — all content and commerce is pincode-scoped
-No Gemini/AI coding — Claude Code only via Claude Max
-Data Connect for structured data — not raw Firestore for shop/product data
-
-Do Not Touch ⛔
-
-.env.local — never modify or expose
-/dataconnect/schema/schema.gql — confirm before any schema changes
-firebase.json and apphosting.yaml — deployment config is stable
-/src/lib/billing/ — parsers are complete, do not refactor
-
-Next 3 Priorities
-
-WhatsApp News Delivery — when a user sends a message to the
-Gilli WhatsApp number with their pincode, they should receive
-today's Gully news digest for that pincode
-WhatsApp Pincode Subscription — users can subscribe to daily
-news for their pincode via WhatsApp keyword
-Shop Listings Web View — display local shops by pincode
-on the web app as a directory
-
-How to Run
-bash# Kill any existing instance first
-pkill -f "next dev"
-
-# Start dev server
-npm run dev
-
-# App runs on http://localhost:3000
-Known Issues
-
-Hydration error on date display — FIXED 07-03-2026 (useState/useEffect)
-Cross-origin warning in Firebase Studio preview — harmless, ignore
-Vercel config present but deployment target is Firebase App Hosting
-
-Session Resume Prompt
-Paste this at the start of every Claude Code session:
-"Read CLAUDE.md. We are resuming Gilli platform build.
-Current priority: [STATE WHAT YOU ARE WORKING ON TODAY]"
+## Content
+- Sri Murugan Departmental Stores videos uploaded to YouTube
+- Sri Abirami Fresh Greens (Deva) video pending
+- Launch post drafted: launch_copy.md
+- Heritage articles: /chennai (Ten Names), /chennai/vyasarpadi

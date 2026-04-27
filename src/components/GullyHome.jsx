@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useFeed } from '../lib/useFeed';
+import { useRouter } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════
 // GULLY — Chennai's Neighbourhood News Platform
@@ -578,7 +579,7 @@ function ZoneGrid({ onSelect }) {
           <div style={{ fontFamily: f.sans, fontSize: 11, fontWeight: 700, color: C.light, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 5 }}>{z} Chennai</div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
             {CHENNAI_PINCODES.filter(p => p.zone === z).map(p => (
-              <span key={p.code} onClick={() => onSelect(p.code)} title={p.area} style={{ fontFamily: f.mono, fontSize: 11, color: C.teal, background: C.teal + "10", padding: "3px 8px", borderRadius: 6, cursor: "pointer" }}>
+              <span key={p.code} onClick={() => { window.location.href = '/pincode/' + p.code; }} title={p.area} style={{ fontFamily: f.mono, fontSize: 11, color: C.teal, background: C.teal + "10", padding: "3px 8px", borderRadius: 6, cursor: "pointer" }}>
                 {p.code}
               </span>
             ))}
@@ -621,7 +622,7 @@ function PincodeDrawer({ open, onClose, pincode, setPincode }) {
           <div key={z} style={{ marginBottom: 12 }}>
             <div style={{ fontFamily: f.sans, fontSize: 11, fontWeight: 700, color: C.light, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>{z}</div>
             {CHENNAI_PINCODES.filter(p => p.zone === z).map(p => (
-              <button key={p.code} onClick={() => { setPincode(p.code); onClose(); }} style={{
+              <button key={p.code} onClick={() => { setPincode(p.code); onClose(); window.location.href = '/pincode/' + p.code; }} style={{
                 width: "100%", background: pincode === p.code ? C.teal : "transparent",
                 color: pincode === p.code ? "#FFF" : C.text,
                 border: `1px solid ${pincode === p.code ? C.teal : C.borderL}`,

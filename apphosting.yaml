@@ -1,45 +1,42 @@
-
-
 # Firebase App Hosting config for Gilli
 # https://firebase.google.com/docs/app-hosting/configure
- 
+
 runConfig:
   minInstances: 0
   # maxInstances: 100
   # concurrency: 80
   # cpu: 1
   # memoryMiB: 512
- 
+
 env:
   # WhatsApp webhook verification token (non-secret, just needs to match provider config)
   - variable: WHATSAPP_VERIFY_TOKEN
     value: gully_gilli_2026
     availability:
       - RUNTIME
- 
+
   # Firebase Admin SDK credentials — needed for webhook to write to Firestore
   - variable: FB_ADMIN_PROJECT_ID
     secret: GILLI_PROJECT_ID
     availability:
       - RUNTIME
- 
+
   - variable: FB_ADMIN_CLIENT_EMAIL
     secret: GILLI_CLIENT_EMAIL
     availability:
       - RUNTIME
- 
+
   - variable: FB_ADMIN_PRIVATE_KEY
     secret: FIREBASE_PRIVATE_KEY
     availability:
       - RUNTIME
- 
+
   # Anthropic API key for news generator
   - variable: ANTHROPIC_API_KEY
     secret: ANTHROPIC_API_KEY
     availability:
       - RUNTIME
- 
- 
+
   # Firebase Client SDK config - public keys baked into browser bundle
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: AIzaSyBvoeENMuts2MnLLjwani4Z5BA5NsQ825M
@@ -75,4 +72,12 @@ env:
     value: "1:1019821537546:web:d191795db9b87b70a762f3"
     availability:
       - BUILD
+      - RUNTIME
+  - variable: RAZORPAY_KEY_ID
+    secret: RAZORPAY_KEY_ID
+    availability:
+      - RUNTIME
+  - variable: RAZORPAY_KEY_SECRET
+    secret: RAZORPAY_KEY_SECRET
+    availability:
       - RUNTIME

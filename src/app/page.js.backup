@@ -1,0 +1,181 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+
+const POPULAR_PINCODES = [
+  { code: '600001', area: 'George Town / Parrys' },
+  { code: '600004', area: 'Mylapore' },
+  { code: '600017', area: 'T Nagar' },
+  { code: '600020', area: 'Adyar' },
+  { code: '600028', area: 'RA Puram / Santhome' },
+  { code: '600034', area: 'Nungambakkam' },
+  { code: '600040', area: 'Anna Nagar' },
+  { code: '600041', area: 'Tiruvanmiyur' },
+  { code: '600042', area: 'Velachery' },
+];
+
+function isValidPincode(p) {
+  return /^[1-8]\d{5}$/.test(p);
+}
+
+export default function Home() {
+  const [pincode, setPincode] = useState('');
+  const [error, setError] = useState('');
+
+  function handleSubmit(e) {
+    if (e) e.preventDefault();
+    const p = pincode.trim();
+    if (!isValidPincode(p)) {
+      setError('Please enter a valid 6-digit pincode');
+      return;
+    }
+    window.location.href = '/pincode/' + p;
+  }
+
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') handleSubmit();
+  }
+
+  return (
+    <div style={s.page}>
+      <div style={s.container}>
+
+        <header style={s.masthead}>
+          <div style={s.logo}>Gully</div>
+          <div style={s.logoSubtitle}>Chennai · By Pincode</div>
+        </header>
+
+        <section style={s.hero}>
+          <h1 style={s.heroTitle}>
+            The shops of your neighbourhood,<br />
+            honoured by the people who shop there.
+          </h1>
+          <p style={s.heroSubtitle}>
+            Chennai&apos;s first pincode-organised shop directory. Start by entering yours.
+          </p>
+
+          <div style={s.inputWrap}>
+            <input
+              type="text"
+              value={pincode}
+              onChange={e => { setPincode(e.target.value); setError(''); }}
+              onKeyDown={handleKeyDown}
+              placeholder="Your pincode e.g. 600028"
+              maxLength={6}
+              inputMode="numeric"
+              style={s.input}
+            />
+            <button onClick={handleSubmit} style={s.submitBtn}>
+              See your neighbourhood →
+            </button>
+          </div>
+          {error && <div style={s.error}>{error}</div>}
+
+          <div style={s.coverageNote}>
+            <p style={s.coverageLine}>
+              We have <strong>9,340 shops across 130 Chennai pincodes</strong> to start with. Type any Indian pincode — yours, your parents', your favourite neighbourhood's.
+            </p>
+            <p style={s.coverageLineSub}>
+              If your pincode isn't here yet, help us add the shops you love. Chennai, Mumbai, Delhi, Bangalore, or anywhere else — every neighbourhood starts with one shop.
+            </p>
+          </div>
+          <div style={s.archiveCallout}>
+            <span style={s.archiveLabel}>From the Archive</span>
+            <Link href='/chennai' style={s.archiveLink}>
+              Read: The Ten Names of Chennai →
+            </Link>
+          </div>
+        </section>
+
+        <section style={s.popularSection}>
+          <div style={s.popularLabel}>Or jump to a pincode</div>
+          <div style={s.pincodeGrid}>
+            {POPULAR_PINCODES.map(p => (
+              <Link key={p.code} href={'/pincode/' + p.code} style={s.pincodeCard}>
+                <span style={s.pincodeCode}>{p.code}</span>
+                <span style={s.pincodeArea}>{p.area}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section style={s.aboutSection}>
+          <h2 style={s.sectionTitle}>What is Gully?</h2>
+          <p style={s.aboutText}>
+            Chennai has over 9,000 neighbourhood shops organised by pincode — the same way you already
+            think about your neighbourhood. Gully lets you browse them, add the ones missing, and
+            eventually vote for the best.
+          </p>
+          <p style={s.aboutText}>
+            Built by Chennai residents. Free to use. No city-wide aggregation — just your pincode,
+            your streets, your shops.
+          </p>
+        </section>
+
+        <section style={s.actionsSection}>
+          <Link href="/awards/nominate" style={s.primaryAction}>
+            <div style={s.actionLabel}>Add a shop</div>
+            <div style={s.actionDesc}>Know a great shop that isn&apos;t listed? Add it to your pincode.</div>
+          </Link>
+          <Link href="/awards" style={s.secondaryAction}>
+            <div style={s.actionLabel}>Gully Awards</div>
+            <div style={s.actionDesc}>See the most-nominated shops across Chennai.</div>
+          </Link>
+        </section>
+
+        <footer style={s.footer}>
+          <p style={s.footerLine}>
+            Early release · Awards voting opens soon
+          </p>
+          <p style={s.footerLine}>
+            mygully.in · Chennai · 2026
+          </p>
+          <p style={s.footerLine}>
+            <Link href='/chennai' style={{ color: '#888', textDecoration: 'underline', marginRight: 12 }}>Archive</Link>
+            <Link href='/privacy' style={{ color: '#888', textDecoration: 'underline', marginRight: 12 }}>Privacy Policy</Link>
+            <Link href='/terms' style={{ color: '#888', textDecoration: 'underline' }}>Terms of Service</Link>
+          </p>
+        </footer>
+
+      </div>
+    </div>
+  );
+}
+
+const s = {
+  page: { minHeight: '100vh', background: '#fafaf7', fontFamily: 'Playfair Display, Georgia, serif', color: '#1a1a1a' },
+  container: { maxWidth: 820, margin: '0 auto', padding: '40px 20px 60px' },
+  masthead: { textAlign: 'center', borderBottom: '2px solid #1a1a1a', paddingBottom: 20, marginBottom: 48 },
+  logo: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 56, fontWeight: 800, letterSpacing: '-0.03em', lineHeight: 1 },
+  logoSubtitle: { fontFamily: 'Arial, sans-serif', fontSize: 12, fontWeight: 600, letterSpacing: '0.25em', textTransform: 'uppercase', color: '#666', marginTop: 8 },
+  hero: { textAlign: 'center', marginBottom: 48 },
+  heroTitle: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 30, fontWeight: 700, lineHeight: 1.3, margin: '0 0 16px', letterSpacing: '-0.01em' },
+  heroSubtitle: { fontFamily: 'Arial, sans-serif', fontSize: 16, color: '#555', margin: '0 0 32px', lineHeight: 1.5 },
+  inputWrap: { display: 'flex', gap: 10, maxWidth: 520, margin: '0 auto', flexWrap: 'wrap', justifyContent: 'center' },
+  input: { flex: '1 1 200px', padding: '14px 16px', fontSize: 16, fontFamily: 'Arial, sans-serif', border: '1.5px solid #d5d5d0', borderRadius: 8, outline: 'none', background: '#fff' },
+  submitBtn: { padding: '14px 22px', background: '#e85d26', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'Arial, sans-serif', fontSize: 15, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' },
+  error: { fontFamily: 'Arial, sans-serif', fontSize: 13, color: '#c94a1a', marginTop: 12 },
+  coverageNote: { maxWidth: 520, margin: '24px auto 0', textAlign: 'center', padding: '16px 20px', background: '#fff8f3', borderLeft: '3px solid #e85d26', borderRadius: 6 },
+  coverageLine: { fontFamily: 'Playfair Display, Georgia, serif', fontStyle: 'italic', fontSize: 14, color: '#333', margin: '0 0 8px', lineHeight: 1.5 },
+  coverageLineSub: { fontFamily: 'Playfair Display, Georgia, serif', fontStyle: 'italic', fontSize: 13, color: '#555', margin: 0, lineHeight: 1.5 },
+  archiveCallout: { maxWidth: 520, margin: '18px auto 0', textAlign: 'center', padding: '4px 20px' },
+  archiveLabel: { display: 'block', fontFamily: 'Arial, sans-serif', fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888', marginBottom: 6 },
+  archiveLink: { fontFamily: 'Playfair Display, Georgia, serif', fontStyle: 'italic', fontSize: 16, color: '#1a1a1a', textDecoration: 'none', borderBottom: '1px solid #1a1a1a', paddingBottom: 2 },
+  popularSection: { marginBottom: 48 },
+  popularLabel: { fontFamily: 'Arial, sans-serif', fontSize: 12, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#888', textAlign: 'center', marginBottom: 16 },
+  pincodeGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 },
+  pincodeCard: { background: '#fff', border: '1px solid #e5e5e0', borderRadius: 8, padding: '12px 14px', textDecoration: 'none', color: '#1a1a1a', display: 'flex', flexDirection: 'column', gap: 2 },
+  pincodeCode: { fontFamily: 'ui-monospace, Menlo, monospace', fontSize: 13, fontWeight: 700, color: '#e85d26' },
+  pincodeArea: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 14, color: '#333' },
+  aboutSection: { background: '#fff', border: '1px solid #e5e5e0', borderRadius: 12, padding: '24px 22px', marginBottom: 32 },
+  sectionTitle: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 22, fontWeight: 700, margin: '0 0 12px' },
+  aboutText: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 15, lineHeight: 1.6, color: '#333', margin: '0 0 12px' },
+  actionsSection: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginBottom: 48 },
+  primaryAction: { background: '#fff8f3', border: '1.5px solid #f0c8a8', borderRadius: 12, padding: '20px 22px', textDecoration: 'none', color: '#1a1a1a', display: 'block' },
+  secondaryAction: { background: '#fff', border: '1px solid #e5e5e0', borderRadius: 12, padding: '20px 22px', textDecoration: 'none', color: '#1a1a1a', display: 'block' },
+  actionLabel: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 19, fontWeight: 700, marginBottom: 6 },
+  actionDesc: { fontFamily: 'Arial, sans-serif', fontSize: 13, color: '#555', lineHeight: 1.4 },
+  footer: { borderTop: '1px solid #e5e5e0', paddingTop: 20, textAlign: 'center' },
+  footerLine: { fontFamily: 'Arial, sans-serif', fontSize: 12, color: '#888', margin: '0 0 6px', letterSpacing: '0.02em' },
+};
