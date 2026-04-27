@@ -1,4 +1,5 @@
 'use client';
+import { isMobile, getContactPhone, getWhatsAppNumber, shopWhatsAppUrl, shopShareUrl } from '../../../lib/utils';
 
 import { analytics } from '../../../lib/analytics';
 import { useEffect, useState, useMemo } from 'react';
@@ -66,6 +67,7 @@ export default function PincodePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [displayCount, setDisplayCount] = useState(50);
  
   useEffect(() => {
     if (!isValidPincode(pincode)) {
@@ -80,7 +82,7 @@ export default function PincodePage() {
         const q = query(
           collection(db, 'businesses'),
           where('pincode', '==', pincode),
-          limit(1000)
+          limit(500)
         );
         const snap = await getDocs(q);
         // Select only safe public fields. No phone, no address, no source.
@@ -129,10 +131,16 @@ export default function PincodePage() {
     return { grouped: map, categories: cats };
   }, [shops]);
  
-  const visibleShops = useMemo(() => {
+  const allVisible = useMemo(() => {
     if (selectedCategory === 'All') return shops;
     return grouped[selectedCategory] || [];
   }, [selectedCategory, shops, grouped]);
+
+  const visibleShops = useMemo(() => {
+    return allVisible.slice(0, displayCount);
+  }, [allVisible, displayCount]);
+
+  const hasMore = allVisible.length > displayCount;
  
   const areaName = PINCODE_AREAS[pincode] || null;
  
@@ -179,7 +187,7 @@ export default function PincodePage() {
           <div style={styles.chipRow}>
             <button
               style={selectedCategory === 'All' ? styles.chipActive : styles.chip}
-              onClick={() => setSelectedCategory('All')}
+              onClick={() => { setSelectedCategory('All'); setDisplayCount(50); }}
             >
               All ({shops.length})
             </button>
@@ -187,7 +195,7 @@ export default function PincodePage() {
               <button
                 key={cat}
                 style={selectedCategory === cat ? styles.chipActive : styles.chip}
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => { setSelectedCategory(cat); setDisplayCount(50); }}
               >
                 {cat} ({grouped[cat].length})
               </button>
@@ -272,6 +280,17 @@ onClick={() => analytics.shareClick(shop.id, pincode, cityFromPincode(pincode))}
               ))}
             </div>
  
+            {hasMore && (
+              <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                <button
+                  onClick={() => setDisplayCount(n => n + 50)}
+                  style={{ padding: '12px 32px', background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'Arial, sans-serif', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Load more shops ({allVisible.length - displayCount} remaining)
+                </button>
+              </div>
+            )}
+
             {/* Add a shop CTA */}
             <div style={styles.addMoreSection}>
               <h3 style={{ margin: '0 0 8px' }}>Missing a favourite shop?</h3>

@@ -57,20 +57,23 @@ function DashboardContent() {
       const bSnap = await getDocs(query(collection(clientDb, 'businesses'), where('claimed_by_phone', '==', ph)));
       const shopList = bSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       setShops(shopList);
-      const allPayments = [];
-      for (const shop of shopList) {
-        const pSnap = await getDocs(query(collection(clientDb, 'payments'), where('businessId', '==', shop.id)));
-        pSnap.docs.forEach(d => allPayments.push({ id: d.id, ...d.data(), shopName: shop.name }));
-      }
-      setPayments(allPayments);
+      const paymentResults = await Promise.all(
+        shopList.map(shop =>
+          getDocs(query(collection(clientDb, 'payments'), where('businessId', '==', shop.id)))
+            .then(snap => snap.docs.map(d => ({ id: d.id, ...d.data(), shopName: shop.name })))
+        )
+      );
+      setPayments(paymentResults.flat());
+      const analyticsResults = await Promise.all(
+        shopList.map(shop =>
+          getDocs(query(collection(clientDb, 'analytics_events'), where('businessId', '==', shop.id)))
+            .then(snap => snap.docs.map(d => d.data()))
+        )
+      );
       const ev = {};
-      for (const shop of shopList) {
-        const aSnap = await getDocs(query(collection(clientDb, 'analytics_events'), where('businessId', '==', shop.id)));
-        aSnap.docs.forEach(d => {
-          const e = d.data().event;
-          ev[e] = (ev[e] || 0) + 1;
-        });
-      }
+      analyticsResults.flat().forEach(data => {
+        if (data.event) ev[data.event] = (ev[data.event] || 0) + 1;
+      });
       setEvents(ev);
     } catch (e) { console.error(e); }
     setLoading(false);

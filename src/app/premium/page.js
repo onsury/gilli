@@ -4,36 +4,67 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
  
 function PremiumContent() {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.async = true;
-    document.body.appendChild(script);
-    return () => { document.body.removeChild(script); };
-  }, []);
   const params = useSearchParams();
   const router = useRouter();
   const businessId = params.get('businessId');
   const shopName = params.get('name') || 'Your Shop';
   const phone = params.get('phone') || '';
+ 
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
+  const [razorpayReady, setRazorpayReady] = useState(false);
  
+  // Redirect if no businessId
   useEffect(() => {
     if (!businessId) router.push('/');
   }, [businessId, router]);
  
+  // Load Razorpay script and set ready flag on load
+  useEffect(() => {
+    if (window.Razorpay) {
+      setRazorpayReady(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => setRazorpayReady(true);
+    script.onerror = () => setStatus('Payment system failed to load. Please refresh.');
+    document.body.appendChild(script);
+    return () => {
+      // Only remove if we added it
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+ 
   async function handlePayment() {
+    // Guard: Razorpay script not loaded yet
+    if (!razorpayReady || !window.Razorpay) {
+      setStatus('Payment system is loading, please wait a moment and try again.');
+      return;
+    }
+    if (!businessId) {
+      setStatus('Invalid shop. Please go back and try again.');
+      return;
+    }
+ 
     setLoading(true);
     setStatus('Creating order...');
+ 
     try {
       const res = await fetch('/api/payment/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ businessId, phone }),
       });
+ 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+ 
+      if (!res.ok) {
+        throw new Error(data.error || 'Order creation failed');
+      }
  
       const options = {
         key: data.keyId,
@@ -44,27 +75,33 @@ function PremiumContent() {
         order_id: data.orderId,
         handler: async function(response) {
           setStatus('Verifying payment...');
-          const verify = await fetch('/api/payment/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              businessId,
-              phone,
-            }),
-          });
-          const result = await verify.json();
-          if (result.success) {
-            const invUrl = result.invoiceUrl || '';
-            setStatus('Payment successful! Your shop is now premium.' + (invUrl ? ' Invoice: ' + invUrl : ''));
-            if (invUrl) {
-              setTimeout(() => window.open(invUrl, '_blank'), 1000);
+          try {
+            const verify = await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                businessId,
+                phone,
+              }),
+            });
+            const result = await verify.json();
+            if (result.success) {
+              setStatus('Payment successful! Your listing is now premium.');
+              // Open invoice in new tab
+              if (result.invoiceUrl) {
+                setTimeout(() => window.open(result.invoiceUrl, '_blank'), 800);
+              }
+              // Redirect to shop page
+              setTimeout(() => router.push('/shop/' + businessId), 3000);
+            } else {
+              setStatus('Verification failed. Please contact hello@mygully.in with your payment ID.');
             }
-            setTimeout(() => router.push('/shop/' + businessId), 3000);
-          } else {
-            setStatus('Verification failed. Contact hello@mygully.in');
+          } catch (verifyErr) {
+            setStatus('Verification error. Please contact hello@mygully.in');
+            console.error('verify error:', verifyErr);
           }
           setLoading(false);
         },
@@ -79,9 +116,13 @@ function PremiumContent() {
       };
  
       const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function(response) {
+        setStatus('Payment failed: ' + (response.error?.description || 'Unknown error'));
+        setLoading(false);
+      });
       rzp.open();
     } catch (e) {
-      setStatus('Error: ' + e.message);
+      setStatus('Error: ' + (e.message || 'Something went wrong'));
       setLoading(false);
     }
   }
@@ -107,10 +148,14 @@ function PremiumContent() {
           </div>
           <button
             onClick={handlePayment}
-            disabled={loading}
-            style={{ ...s.payBtn, opacity: loading ? 0.7 : 1 }}
+            disabled={loading || !razorpayReady}
+            style={{
+              ...s.payBtn,
+              opacity: (loading || !razorpayReady) ? 0.7 : 1,
+              cursor: (loading || !razorpayReady) ? 'not-allowed' : 'pointer',
+            }}
           >
-            {loading ? 'Processing...' : 'Pay Rs.499 -- Go Premium'}
+            {loading ? 'Processing...' : !razorpayReady ? 'Loading payment...' : 'Pay Rs.499 -- Go Premium'}
           </button>
           {status && <p style={s.status}>{status}</p>}
           <p style={s.note}>Secure payment via Razorpay. Cancel anytime.</p>
@@ -122,7 +167,7 @@ function PremiumContent() {
  
 export default function PremiumPage() {
   return (
-    <Suspense fallback={<div style={{ padding: 40, textAlign: 'center' }}>Loading...</div>}>
+    <Suspense fallback={<div style={{ padding: 40, textAlign: 'center', fontFamily: 'Georgia, serif' }}>Loading...</div>}>
       <PremiumContent />
     </Suspense>
   );
@@ -131,7 +176,7 @@ export default function PremiumPage() {
 const s = {
   page: { minHeight: '100vh', background: '#faf9f6', fontFamily: 'Georgia, serif' },
   container: { maxWidth: 480, margin: '0 auto', padding: '40px 20px' },
-  back: { fontFamily: 'Arial, sans-serif', fontSize: 13, color: '#e85d26', textDecoration: 'none', display: 'inline-block', marginBottom: 24 },
+  back: { display: 'inline-block', fontFamily: 'Playfair Display, Georgia, serif', fontSize: 22, fontWeight: 900, color: '#1a1a1a', textDecoration: 'none', marginBottom: 24, letterSpacing: '-0.02em' },
   card: { background: '#fff', border: '2px solid #1a1a1a', borderRadius: 12, padding: 32, textAlign: 'center' },
   badge: { display: 'inline-block', fontFamily: 'Arial, sans-serif', fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', color: '#e85d26', border: '1px solid #e85d26', padding: '4px 12px', borderRadius: 20, marginBottom: 16 },
   title: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 24, fontWeight: 700, margin: '0 0 8px' },
@@ -141,8 +186,8 @@ const s = {
   price: { marginBottom: 24 },
   amount: { fontFamily: 'Playfair Display, Georgia, serif', fontSize: 48, fontWeight: 900, color: '#1a1a1a' },
   period: { fontFamily: 'Arial, sans-serif', fontSize: 16, color: '#888' },
-  payBtn: { display: 'block', width: '100%', padding: '16px', background: '#e85d26', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'Arial, sans-serif', fontSize: 16, fontWeight: 700, cursor: 'pointer', marginBottom: 16 },
-  status: { fontFamily: 'Arial, sans-serif', fontSize: 14, color: '#333', padding: '12px', background: '#fff8f0', borderRadius: 8, margin: '0 0 16px' },
+  payBtn: { display: 'block', width: '100%', padding: '16px', background: '#e85d26', color: '#fff', border: 'none', borderRadius: 8, fontFamily: 'Arial, sans-serif', fontSize: 16, fontWeight: 700, marginBottom: 16 },
+  status: { fontFamily: 'Arial, sans-serif', fontSize: 14, color: '#333', padding: '12px', background: '#fff8f0', borderRadius: 8, margin: '0 0 16px', lineHeight: 1.5 },
   note: { fontFamily: 'Arial, sans-serif', fontSize: 12, color: '#aaa', margin: 0 },
 };
  

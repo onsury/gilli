@@ -61,14 +61,14 @@ const CITIES = [
   ]},
   { id: 'kolkata',   label: 'Kolkata',   pincodes: [
     { code: '700001', area: 'BBD Bagh / Dalhousie' },
-    { code: '700012', area: 'Shyambazar' },
+    { code: '700007', area: 'Bhowanipore' },
     { code: '700019', area: 'Ballygunge' },
-    { code: '700025', area: 'Lake Market' },
-    { code: '700029', area: 'Behala' },
+    { code: '700026', area: 'Lake Market' },
+    { code: '700031', area: 'Nager Bazar' },
     { code: '700034', area: 'Dum Dum' },
-    { code: '700048', area: 'Jadavpur' },
+    { code: '700040', area: 'Ariadaha' },
+    { code: '700048', area: 'Garfa' },
     { code: '700064', area: 'Garia' },
-    { code: '700080', area: 'Salt Lake' },
   ]},
 ];
  
